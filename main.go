@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"ghibli/pkg/config"
 	"io"
 	"log"
 	"net/http"
 )
 
-/* 
+/*
  *   Get Movie IDs from company queries.
      Get Movie Details from Details query.
      Store in DB.
@@ -16,7 +17,10 @@ import (
  
 func main() {
 
-	url := "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=JP&page=1&sort_by=popularity.desc&with_companies="
+    config.Init()
+    generalConfigs := config.Get()
+
+	url := "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=JP&page=1&sort_by=popularity.desc&with_companies="+generalConfigs.TMDB.Query.Studio_ghibli_id
 
 	req, err := http.NewRequest("GET", url, nil)
     if err != nil {
@@ -24,7 +28,8 @@ func main() {
     }
 
 	req.Header.Add("accept", "application/json")
-	req.Header.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIwYTFhN2VkMGQ4N2Y3YzAwZjM4OTNkOGU4YmZjMGZmMyIsInN1YiI6IjY1NjljM2Q2Y2Y0OGExMDEzYjk1NzBiZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.j2dG9FMEd9braI7coiyM1XMyL3AO3NDRxH-VHsvnmSE")
+    // Watch out for space before Bearer!
+	req.Header.Add("Authorization", "Bearer " + generalConfigs.TMDB.Api_reader_access_token)
 
     res, err := http.DefaultClient.Do(req)
     if err != nil {
